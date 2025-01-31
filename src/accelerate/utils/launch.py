@@ -325,8 +325,10 @@ def prepare_deepspeed_cmd_env(args: argparse.Namespace) -> Tuple[List[str], Dict
         args.deepspeed_multinode_launcher = DEEPSPEED_MULTINODE_LAUNCHERS[0]
 
     if num_machines > 1 and args.deepspeed_multinode_launcher != DEEPSPEED_MULTINODE_LAUNCHERS[1]:
-        cmd = ["deepspeed", "--no_local_rank"]
-        cmd.extend(["--hostfile", str(args.deepspeed_hostfile), "--launcher", str(args.deepspeed_multinode_launcher)])
+        # HOT FIX
+        cmd = ["deepspeed", "--no_local_rank", "--no_ssh"]
+        cmd.extend(["--node_rank", str(args.machine_rank), "--hostfile", str(args.deepspeed_hostfile), "--launcher", str(args.deepspeed_multinode_launcher)])
+
         if args.deepspeed_exclusion_filter is not None:
             cmd.extend(
                 [
